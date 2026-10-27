@@ -1,0 +1,213 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>My Zone</title>
+<style>
+  /* ===== สีหลัก แก้ตรงนี้เพื่อเปลี่ยนธีม ===== */
+  :root { --bg1: #ff9a9e; --bg2: #a18cd1; }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+  body {
+    min-height: 100dvh; display: flex; align-items: center; justify-content: center;
+    background: #111; color: #fff;
+    font-family: -apple-system, "Sarabun", "Noto Sans Thai", system-ui, sans-serif;
+  }
+
+  /* กรอบมือถือ */
+  .phone {
+    position: relative; width: 100%; max-width: 390px;
+    height: 100dvh; max-height: 800px; overflow: hidden;
+  }
+  @media (min-width: 500px) {
+    .phone { border-radius: 40px; box-shadow: 0 20px 60px rgba(0,0,0,.6); }
+  }
+
+  /* แถบสถานะด้านบน (เวลา / 5G / แบต) */
+  .status {
+    position: absolute; top: 0; left: 0; right: 0; z-index: 10;
+    display: flex; justify-content: space-between;
+    padding: 14px 22px; font-size: 14px; font-weight: 600;
+    pointer-events: none;
+  }
+
+  /* แต่ละหน้าจอซ้อนกันเป็นชั้น */
+  .screen { position: absolute; inset: 0; transition: transform .45s ease, opacity .35s ease; }
+  #home { z-index: 1; background: linear-gradient(160deg, #fdfbfb, #ebedee); color: #222; padding: 70px 22px 22px; overflow-y: auto; }
+  #pass { z-index: 2; background: linear-gradient(160deg, var(--bg2), #4a3f78); display: flex; flex-direction: column; align-items: center; padding-top: 90px; }
+  #lock { z-index: 3; background: linear-gradient(160deg, var(--bg1), var(--bg2)); touch-action: none; text-align: center; padding-top: 90px; }
+
+  /* ===== หน้าล็อก ===== */
+  #clock { font-size: 82px; font-weight: 300; letter-spacing: -2px; }
+  #date  { font-size: 18px; margin-top: 4px; opacity: .9; }
+  .notice {
+    margin: 36px 22px 0; padding: 14px 16px; border-radius: 18px; text-align: left;
+    background: rgba(255,255,255,.22); backdrop-filter: blur(12px);
+  }
+  .notice b { display: block; font-size: 14px; margin-bottom: 3px; }
+  .notice span { font-size: 14px; opacity: .95; }
+  .hint { position: absolute; bottom: 26px; left: 0; right: 0; font-size: 15px; opacity: .9; cursor: pointer; animation: bounce 2s infinite; }
+  .hint::before { content: ""; display: block; width: 120px; height: 5px; border-radius: 3px; background: #fff; margin: 0 auto 12px; }
+  @keyframes bounce { 0%,100% { transform: translateY(0); } 50% { transform: translateY(-8px); } }
+
+  /* ===== หน้าใส่รหัส ===== */
+  #passMsg { font-size: 18px; margin-bottom: 18px; height: 24px; }
+  .dots { display: flex; gap: 18px; margin-bottom: 40px; }
+  .dot { width: 14px; height: 14px; border-radius: 50%; border: 2px solid #fff; }
+  .dot.on { background: #fff; }
+  .dots.shake { animation: shake .4s; }
+  @keyframes shake { 0%,100% { transform: translateX(0); } 25% { transform: translateX(-10px); } 75% { transform: translateX(10px); } }
+  .keys { display: grid; grid-template-columns: repeat(3, 74px); gap: 16px; }
+  .key {
+    width: 74px; height: 74px; border-radius: 50%; border: none; cursor: pointer;
+    background: rgba(255,255,255,.2); color: #fff; font-size: 30px;
+  }
+  .key:active { background: rgba(255,255,255,.45); }
+  .key.blank { visibility: hidden; }
+  #cancel { margin-top: 26px; background: none; border: none; color: #fff; font-size: 16px; cursor: pointer; }
+
+  /* ===== หน้าหลักหลังปลดล็อก ===== */
+  #home h1 { font-size: 28px; }
+  #home .sub { color: #777; margin-top: 4px; }
+  .card { margin-top: 22px; padding: 18px; border-radius: 20px; background: #fff; box-shadow: 0 4px 16px rgba(0,0,0,.08); line-height: 1.6; }
+  .apps { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; margin-top: 26px; text-align: center; }
+  .app a { text-decoration: none; color: #333; font-size: 12px; }
+  .icon {
+    width: 60px; height: 60px; border-radius: 16px; margin: 0 auto 6px;
+    display: flex; align-items: center; justify-content: center; font-size: 28px;
+    background: linear-gradient(160deg, var(--bg1), var(--bg2));
+  }
+  #relock { margin-top: 30px; width: 100%; padding: 14px; border: none; border-radius: 14px; font-size: 16px; color: #fff; cursor: pointer; background: linear-gradient(160deg, var(--bg1), var(--bg2)); }
+</style>
+</head>
+<body>
+
+<div class="phone">
+  <!-- แถบสถานะ -->
+  <div class="status"><span id="statusTime">--:--</span><span>5G 🔋</span></div>
+
+  <!-- ชั้นล่างสุด: หน้าหลัก -->
+  <div class="screen" id="home">
+    <h1 id="hello"></h1>
+    <p class="sub">ยินดีต้อนรับสู่โซนของฉัน</p>
+    <div class="card" id="homeMsg"></div>
+    <div class="apps" id="apps"></div>
+    <button id="relock">🔒 ล็อกหน้าจอ</button>
+  </div>
+
+  <!-- ชั้นกลาง: ใส่รหัส -->
+  <div class="screen" id="pass">
+    <div id="passMsg">ใส่รหัสผ่าน</div>
+    <div class="dots" id="dots"></div>
+    <div class="keys" id="keys"></div>
+    <button id="cancel">ยกเลิก</button>
+  </div>
+
+  <!-- ชั้นบนสุด: หน้าล็อก -->
+  <div class="screen" id="lock">
+    <div id="clock">--:--</div>
+    <div id="date"></div>
+    <div class="notice"><b>📅 ปฏิทิน</b><span id="noticeText"></span></div>
+    <div class="hint" id="hint">ปัดขึ้นเพื่อปลดล็อก</div>
+  </div>
+</div>
+
+<script>
+/* ===== ตั้งค่า แก้ตรงนี้ได้เลย ===== */
+const CONFIG = {
+  name: "ชื่อของคุณ",              // ชื่อที่ทักทายหลังปลดล็อก
+  passcode: "1234",                // รหัสผ่าน 4 หลัก
+  notice: "วันนี้ไม่มีนัดอะไร พักผ่อนได้เลย", // ข้อความแจ้งเตือนบนหน้าล็อก
+  message: "ใส่ข้อความแนะนำตัว หรือเรื่องที่อยากเล่าตรงนี้ได้เลย",
+  apps: [                          // ไอคอนบนหน้าหลัก ใส่ลิงก์จริงได้
+    { icon: "📷", label: "รูปภาพ", url: "#" },
+    { icon: "🎵", label: "เพลง",   url: "#" },
+    { icon: "💬", label: "ติดต่อ", url: "#" },
+    { icon: "⭐", label: "ชอบ",    url: "#" }
+  ]
+};
+
+const $ = id => document.getElementById(id);
+const lock = $("lock"), pass = $("pass");
+
+/* ---------- 1) นาฬิกาจริง ---------- */
+function tick() {
+  const now = new Date();
+  const t = now.toLocaleTimeString("th-TH", { hour: "2-digit", minute: "2-digit", hour12: false });
+  $("clock").textContent = t;
+  $("statusTime").textContent = t;
+  $("date").textContent = now.toLocaleDateString("th-TH", { weekday: "long", day: "numeric", month: "long" });
+}
+tick(); setInterval(tick, 1000);
+
+/* ---------- 2) เติมข้อความจาก CONFIG ---------- */
+$("noticeText").textContent = CONFIG.notice;
+$("hello").textContent = "สวัสดี, " + CONFIG.name;
+$("homeMsg").textContent = CONFIG.message;
+$("apps").innerHTML = CONFIG.apps.map(a =>
+  `<div class="app"><a href="${a.url}"><div class="icon">${a.icon}</div>${a.label}</a></div>`).join("");
+
+/* ---------- 3) ปัดขึ้นเพื่อปลดล็อก ---------- */
+let startY = null;
+lock.addEventListener("pointerdown", e => { startY = e.clientY; });
+lock.addEventListener("pointermove", e => {
+  if (startY === null) return;
+  const dy = Math.min(0, e.clientY - startY);          // ลากขึ้นเท่านั้น
+  lock.style.transition = "none";
+  lock.style.transform = `translateY(${dy}px)`;
+});
+function endSwipe(e) {
+  if (startY === null) return;
+  const dy = e.clientY - startY;
+  startY = null;
+  lock.style.transition = "";
+  if (dy < -80) openPasscode(); else lock.style.transform = "";  // ลากไกลพอ = ปลดล็อก
+}
+lock.addEventListener("pointerup", endSwipe);
+lock.addEventListener("pointercancel", endSwipe);
+$("hint").addEventListener("click", openPasscode);      // กดที่ข้อความก็ได้
+
+function openPasscode() { lock.style.transform = "translateY(-100%)"; lock.style.pointerEvents = "none"; }
+function closePasscode() { lock.style.transform = ""; lock.style.pointerEvents = ""; clearCode(); }
+
+/* ---------- 4) ปุ่มกดรหัส ---------- */
+let code = "";
+const keyLabels = ["1","2","3","4","5","6","7","8","9","","0","⌫"];
+$("keys").innerHTML = keyLabels.map(k =>
+  k === "" ? '<button class="key blank"></button>' : `<button class="key" data-k="${k}">${k}</button>`).join("");
+$("dots").innerHTML = "<div class='dot'></div>".repeat(CONFIG.passcode.length);
+
+function drawDots() {
+  document.querySelectorAll(".dot").forEach((d, i) => d.classList.toggle("on", i < code.length));
+}
+function clearCode() { code = ""; drawDots(); $("passMsg").textContent = "ใส่รหัสผ่าน"; }
+
+$("keys").addEventListener("click", e => {
+  const k = e.target.dataset.k;
+  if (!k) return;
+  if (k === "⌫") code = code.slice(0, -1);
+  else if (code.length < CONFIG.passcode.length) code += k;
+  drawDots();
+
+  if (code.length === CONFIG.passcode.length) {
+    if (code === CONFIG.passcode) {                    // รหัสถูก
+      pass.style.opacity = 0; pass.style.pointerEvents = "none";
+    } else {                                           // รหัสผิด
+      $("passMsg").textContent = "รหัสไม่ถูกต้อง";
+      $("dots").classList.add("shake");
+      setTimeout(() => { $("dots").classList.remove("shake"); clearCode(); $("passMsg").textContent = "รหัสไม่ถูกต้อง"; }, 400);
+    }
+  }
+});
+
+$("cancel").addEventListener("click", closePasscode);
+
+/* ---------- 5) ปุ่มล็อกหน้าจอกลับ ---------- */
+$("relock").addEventListener("click", () => {
+  pass.style.opacity = 1; pass.style.pointerEvents = "";
+  closePasscode();
+});
+</script>
+</body>
+</html>
