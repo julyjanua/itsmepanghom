@@ -5,98 +5,224 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>My Zone</title>
 <style>
-  /* ===== สีหลัก แก้ตรงนี้เพื่อเปลี่ยนธีม ===== */
-  :root { --bg1: #ff9a9e; --bg2: #a18cd1; }
-
+  :root { --bg1: #ff9a9e; --bg2: #a18cd1; --accent: #8e6fd8; }
   * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
   body {
     min-height: 100dvh; display: flex; align-items: center; justify-content: center;
-    background: #111; color: #fff;
+    background: #0d0c18; color: #fff; overflow: hidden;
     font-family: -apple-system, "Sarabun", "Noto Sans Thai", system-ui, sans-serif;
   }
+  button { font-family: inherit; }
 
-  /* กรอบมือถือ */
-  .phone {
-    position: relative; width: 100%; max-width: 390px;
-    height: 100dvh; max-height: 800px; overflow: hidden;
+  .device {
+    position: relative; height: min(calc(100dvh - 16px), 860px);
+    aspect-ratio: 9 / 19.5; max-width: calc(100vw - 16px);
+    padding: 10px; border-radius: 58px; background: #1f1d33;
+    box-shadow: 0 0 0 2px #34314f, 0 24px 70px rgba(0,0,0,.65);
   }
-  @media (min-width: 500px) {
-    .phone { border-radius: 40px; box-shadow: 0 20px 60px rgba(0,0,0,.6); }
-  }
+  .phone { position: relative; width: 100%; height: 100%; border-radius: 48px; overflow: hidden; background: #000; container-type: size; }
+  .island { position: absolute; top: 11px; left: 50%; transform: translateX(-50%); width: 31%; height: 30px; background: #000; border-radius: 20px; z-index: 30; }
 
-  /* แถบสถานะด้านบน (เวลา / 5G / แบต) */
   .status {
-    position: absolute; top: 0; left: 0; right: 0; z-index: 10;
-    display: flex; justify-content: space-between;
-    padding: 14px 22px; font-size: 14px; font-weight: 600;
-    pointer-events: none;
+    position: absolute; top: 0; left: 0; right: 0; z-index: 25;
+    display: flex; justify-content: space-between; align-items: center;
+    padding: 14px 30px 0; height: 52px; font-size: 15px; font-weight: 600;
+    pointer-events: none; transition: color .3s;
   }
+  .phone.light .status { color: #222; }
+  .batt { display: inline-block; width: 24px; height: 12px; border: 1.5px solid currentColor; border-radius: 4px; position: relative; vertical-align: -1px; margin-left: 4px; }
+  .batt::after { content: ""; position: absolute; inset: 1.5px; right: 5px; background: currentColor; border-radius: 2px; }
 
-  /* แต่ละหน้าจอซ้อนกันเป็นชั้น */
   .screen { position: absolute; inset: 0; transition: transform .45s ease, opacity .35s ease; }
-  #home { z-index: 1; background: linear-gradient(160deg, #fdfbfb, #ebedee); color: #222; padding: 70px 22px 22px; overflow-y: auto; }
-  #pass { z-index: 2; background: linear-gradient(160deg, var(--bg2), #4a3f78); display: flex; flex-direction: column; align-items: center; padding-top: 90px; }
-  #lock { z-index: 3; background: linear-gradient(160deg, var(--bg1), var(--bg2)); touch-action: none; text-align: center; padding-top: 90px; }
 
-  /* ===== หน้าล็อก ===== */
-  #clock { font-size: 82px; font-weight: 300; letter-spacing: -2px; }
-  #date  { font-size: 18px; margin-top: 4px; opacity: .9; }
-  .notice {
-    margin: 36px 22px 0; padding: 14px 16px; border-radius: 18px; text-align: left;
-    background: rgba(255,255,255,.22); backdrop-filter: blur(12px);
-  }
-  .notice b { display: block; font-size: 14px; margin-bottom: 3px; }
-  .notice span { font-size: 14px; opacity: .95; }
-  .hint { position: absolute; bottom: 26px; left: 0; right: 0; font-size: 15px; opacity: .9; cursor: pointer; animation: bounce 2s infinite; }
-  .hint::before { content: ""; display: block; width: 120px; height: 5px; border-radius: 3px; background: #fff; margin: 0 auto 12px; }
-  @keyframes bounce { 0%,100% { transform: translateY(0); } 50% { transform: translateY(-8px); } }
+  #lock { z-index: 6; touch-action: none; text-align: center; padding-top: 70px; text-shadow: 0 1px 8px rgba(0,0,0,.35);
+    background: var(--lockwp, linear-gradient(160deg, var(--bg1), var(--bg2))); background-size: cover; background-position: center; }
+  #date { font-size: 18px; opacity: .95; }
+  #clock { font-size: 23cqw; font-weight: 300; letter-spacing: -2px; line-height: 1.05; margin-top: 2px; }
+  #notis { position: absolute; left: 14px; right: 14px; bottom: 88px; display: flex; flex-direction: column; gap: 8px; text-align: left; text-shadow: none; }
+  .noti { background: rgba(38,34,54,.58); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px); border-radius: 22px; padding: 12px 15px; }
+  .noti .nh { display: flex; justify-content: space-between; font-size: 12.5px; opacity: .8; }
+  .noti .nd { font-weight: 700; font-size: 15.5px; margin-top: 5px; }
+  .noti .nt { font-size: 14.5px; margin-top: 1px; }
+  .hint { position: absolute; bottom: 30px; left: 0; right: 0; font-size: 15px; cursor: pointer; }
+  .hint i { display: block; width: 36%; height: 5px; border-radius: 3px; background: #fff; margin: 12px auto 0; opacity: .95; }
 
-  /* ===== หน้าใส่รหัส ===== */
+  #pass { z-index: 5; display: flex; flex-direction: column; align-items: center; padding-top: 110px;
+    background: linear-gradient(rgba(20,16,40,.55), rgba(20,16,40,.7)), var(--lockwp, linear-gradient(160deg, var(--bg2), #4a3f78)); background-size: cover; background-position: center; }
   #passMsg { font-size: 18px; margin-bottom: 18px; height: 24px; }
-  .dots { display: flex; gap: 18px; margin-bottom: 40px; }
+  .dots { display: flex; gap: 18px; margin-bottom: 34px; }
   .dot { width: 14px; height: 14px; border-radius: 50%; border: 2px solid #fff; }
   .dot.on { background: #fff; }
   .dots.shake { animation: shake .4s; }
   @keyframes shake { 0%,100% { transform: translateX(0); } 25% { transform: translateX(-10px); } 75% { transform: translateX(10px); } }
-  .keys { display: grid; grid-template-columns: repeat(3, 74px); gap: 16px; }
-  .key {
-    width: 74px; height: 74px; border-radius: 50%; border: none; cursor: pointer;
-    background: rgba(255,255,255,.2); color: #fff; font-size: 30px;
-  }
+  .keys { display: grid; grid-template-columns: repeat(3, 19cqw); gap: 3.5cqw; }
+  .key { width: 19cqw; height: 19cqw; border-radius: 50%; border: none; cursor: pointer; background: rgba(255,255,255,.2); color: #fff; font-size: 28px; }
   .key:active { background: rgba(255,255,255,.45); }
   .key.blank { visibility: hidden; }
-  #cancel { margin-top: 26px; background: none; border: none; color: #fff; font-size: 16px; cursor: pointer; }
+  #cancel { margin-top: 20px; background: none; border: none; color: #fff; font-size: 16px; cursor: pointer; }
 
-  /* ===== หน้าหลักหลังปลดล็อก ===== */
-  #home h1 { font-size: 28px; }
-  #home .sub { color: #777; margin-top: 4px; }
-  .card { margin-top: 22px; padding: 18px; border-radius: 20px; background: #fff; box-shadow: 0 4px 16px rgba(0,0,0,.08); line-height: 1.6; }
-  .apps { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; margin-top: 26px; text-align: center; }
-  .app a { text-decoration: none; color: #333; font-size: 12px; }
-  .icon {
-    width: 60px; height: 60px; border-radius: 16px; margin: 0 auto 6px;
-    display: flex; align-items: center; justify-content: center; font-size: 28px;
-    background: linear-gradient(160deg, var(--bg1), var(--bg2));
-  }
-  #relock { margin-top: 30px; width: 100%; padding: 14px; border: none; border-radius: 14px; font-size: 16px; color: #fff; cursor: pointer; background: linear-gradient(160deg, var(--bg1), var(--bg2)); }
+  #home { z-index: 1; padding: 62px 4.5cqw 0; text-shadow: 0 1px 6px rgba(0,0,0,.4);
+    background: var(--homewp, linear-gradient(170deg, #3b3560, #a18cd1 60%, #ff9a9e)); background-size: cover; background-position: center; }
+  .widget { padding: 16px 18px; border-radius: 26px; background: rgba(38,34,54,.5); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px); text-shadow: none; }
+  .widget .wh { font-size: 13px; opacity: .85; }
+  .widget .wt { font-weight: 700; font-size: 21px; margin-top: 8px; }
+  .widget .wd { font-size: 14px; opacity: .85; margin-top: 10px; }
+  .widget .wn { font-size: 34px; font-weight: 500; }
+  .apps { display: grid; grid-template-columns: repeat(4, 1fr); gap: 2.6cqh 1cqw; margin-top: 3.2cqh; text-align: center; }
+  .appbtn { background: none; border: none; color: #fff; font-size: 11.5px; cursor: pointer; text-shadow: 0 1px 5px rgba(0,0,0,.55); }
+  .ic { width: 58px; height: 58px; width: 16cqw; height: 16cqw; border-radius: 22%; margin: 0 auto 5px; display: flex; align-items: center; justify-content: center; font-size: 8cqw; box-shadow: 0 3px 10px rgba(0,0,0,.28); text-shadow: none; }
+  .c-chat { background: linear-gradient(160deg, #6ee7a8, #1fa968); }
+  .c-feed { background: linear-gradient(160deg, #ffc46b, #ff4f8b 60%, #8a5cf6); }
+  .c-gal  { background: linear-gradient(160deg, #fff, #eaeaf0); }
+  .c-cal  { background: #fff; color: #111; flex-direction: column; font-size: 8cqw; line-height: 1; }
+  .c-cal .cw { font-size: 3cqw; color: #ff3b30; font-weight: 700; }
+  .c-cam  { background: linear-gradient(160deg, #cfcfd6, #8d8d98); }
+  .c-clk  { background: #fff; }
+  .c-wea  { background: linear-gradient(160deg, #5aa7ff, #2c63c9); }
+  .c-note { background: linear-gradient(180deg, #ffd95a 0 22%, #fff 22%); }
+  .c-vid  { background: linear-gradient(160deg, #ff5a5a, #d11); }
+  .c-set  { background: linear-gradient(160deg, #a5a5ae, #5d5d68); }
+  .c-lock { background: linear-gradient(160deg, #666, #2c2c34); }
+  .c-tel  { background: linear-gradient(160deg, #6ee77a, #1fb23a); }
+  .c-web  { background: linear-gradient(160deg, #fff, #cfe9ff); }
+  .c-msg  { background: linear-gradient(160deg, #78f08a, #24b53f); }
+  .c-mus  { background: linear-gradient(160deg, #ff7a9a, #ff2d55); }
+  .pdots { position: absolute; left: 0; right: 0; bottom: calc(24cqw + 36px); display: flex; justify-content: center; gap: 8px; }
+  .pdots i { width: 7px; height: 7px; border-radius: 50%; background: rgba(255,255,255,.45); }
+  .pdots i:first-child { background: #fff; }
+  .dock { position: absolute; left: 3.5cqw; right: 3.5cqw; bottom: 14px; padding: 2.8cqw 1cqw 1.4cqw; border-radius: 9cqw; background: rgba(255,255,255,.24); backdrop-filter: blur(22px); -webkit-backdrop-filter: blur(22px); display: grid; grid-template-columns: repeat(4, 1fr); }
+  .dock .appbtn { font-size: 0; }
+  .dock .ic { margin-bottom: 0; }
+  #toast { position: absolute; left: 50%; bottom: 120px; transform: translateX(-50%); z-index: 40; background: rgba(30,30,40,.88); color: #fff; padding: 9px 16px; border-radius: 20px; font-size: 13px; opacity: 0; pointer-events: none; transition: opacity .25s; white-space: nowrap; }
+  #toast.show { opacity: 1; }
+
+  .app { z-index: 3; background: #f6f6f8; color: #222; transform: translateY(100%); visibility: hidden; display: flex; flex-direction: column; padding-top: 52px; transition: transform .35s ease, visibility .35s; text-shadow: none; }
+  .app.open { transform: none; visibility: visible; }
+  .hdr { display: flex; align-items: center; height: 48px; padding: 0 8px; background: #fff; border-bottom: 1px solid #e6e6ea; flex-shrink: 0; }
+  .hdr .back { background: none; border: none; font-size: 30px; padding: 0 12px; color: var(--accent); cursor: pointer; }
+  .hdr .ttl { font-weight: 600; font-size: 17px; flex: 1; text-align: center; margin-right: 46px; }
+  .body { flex: 1; overflow-y: auto; }
+
+  .chatitem { display: flex; gap: 12px; align-items: center; padding: 12px 16px; background: #fff; border-bottom: 1px solid #f0f0f2; cursor: pointer; }
+  .av { width: 48px; height: 48px; border-radius: 50%; background: #eee4ff; display: flex; align-items: center; justify-content: center; font-size: 26px; flex-shrink: 0; }
+  .chatitem .t { flex: 1; min-width: 0; }
+  .chatitem .n { font-weight: 600; }
+  .chatitem .l { color: #888; font-size: 13px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; margin-top: 2px; }
+  .chatitem .tm { color: #aaa; font-size: 12px; }
+  #room { display: none; flex-direction: column; height: 100%; background: #dfe7f2; }
+  #msgs { flex: 1; overflow-y: auto; padding: 14px 12px; display: flex; flex-direction: column; gap: 8px; }
+  .b { max-width: 75%; padding: 9px 13px; border-radius: 18px; font-size: 15px; line-height: 1.4; word-break: break-word; }
+  .b small { display: block; font-size: 10px; opacity: .55; margin-top: 3px; }
+  .b.them { background: #fff; align-self: flex-start; border-bottom-left-radius: 4px; }
+  .b.me { background: #8de8a9; align-self: flex-end; border-bottom-right-radius: 4px; }
+  .inputbar { display: flex; gap: 8px; padding: 8px 10px 16px; background: #fff; flex-shrink: 0; }
+  .inputbar input { flex: 1; border: 1px solid #ddd; border-radius: 20px; padding: 10px 14px; font-size: 15px; outline: none; }
+  .inputbar button { border: none; background: var(--accent); color: #fff; border-radius: 20px; padding: 0 16px; cursor: pointer; }
+
+  .post { background: #fff; margin-bottom: 10px; }
+  .post .ph { display: flex; align-items: center; gap: 10px; padding: 10px 12px; }
+  .post .av { width: 36px; height: 36px; font-size: 20px; }
+  .post .pn { font-weight: 600; font-size: 14px; }
+  .post .pt { color: #999; font-size: 11px; }
+  .pimg { width: 100%; aspect-ratio: 1; display: flex; align-items: center; justify-content: center; font-size: 110px; background-size: cover; background-position: center; }
+  .pact { padding: 10px 12px 0; }
+  .like { background: none; border: none; font-size: 26px; cursor: pointer; }
+  .pcnt { padding: 2px 12px; font-weight: 600; font-size: 14px; }
+  .pcap { padding: 2px 12px 14px; font-size: 14px; line-height: 1.5; }
+
+  .calnav { display: flex; align-items: center; justify-content: space-between; padding: 14px 18px; background: #fff; }
+  .calnav button { background: none; border: none; font-size: 24px; color: var(--accent); cursor: pointer; padding: 0 10px; }
+  .calnav b { font-size: 17px; }
+  .grid7 { display: grid; grid-template-columns: repeat(7, 1fr); gap: 4px; padding: 6px 12px 14px; background: #fff; text-align: center; }
+  .dow { font-size: 12px; color: #999; padding: 4px 0; }
+  .day { border-radius: 50%; font-size: 15px; cursor: pointer; position: relative; aspect-ratio: 1; display: flex; align-items: center; justify-content: center; }
+  .day.today { color: var(--accent); font-weight: 700; }
+  .day.sel { background: var(--accent); color: #fff; }
+  .day.has::after { content: ""; position: absolute; bottom: 3px; width: 5px; height: 5px; border-radius: 50%; background: #ff4f8b; }
+  .evtitle { padding: 14px 18px 6px; font-weight: 600; color: #555; }
+  .ev { margin: 6px 14px; padding: 12px 14px; background: #fff; border-radius: 14px; border-left: 5px solid #ff4f8b; }
+  .ev .et { font-size: 12px; color: #999; }
+  .ev .en { font-weight: 600; margin-top: 2px; }
+  .none { color: #aaa; text-align: center; padding: 26px; font-size: 14px; }
+
+  .gal { display: grid; grid-template-columns: repeat(3, 1fr); gap: 2px; background: #fff; }
+  .ph1 { aspect-ratio: 1; display: flex; align-items: center; justify-content: center; font-size: 48px; cursor: pointer; background-size: cover; background-position: center; }
+  #viewer { position: absolute; inset: 0; z-index: 30; background: rgba(0,0,0,.92); display: none; flex-direction: column; align-items: center; justify-content: center; color: #fff; cursor: pointer; }
+  #viewer .big { width: 92%; aspect-ratio: 1; border-radius: 14px; display: flex; align-items: center; justify-content: center; font-size: 160px; background-size: cover; background-position: center; }
+  #viewer p { margin-top: 16px; padding: 0 24px; text-align: center; }
 </style>
 </head>
 <body>
 
-<div class="phone">
-  <!-- แถบสถานะ -->
-  <div class="status"><span id="statusTime">--:--</span><span>5G 🔋</span></div>
+<div class="device">
+<div class="phone" id="phone">
+  <div class="island"></div>
+  <div class="status"><span id="statusTime">--:--</span><span>5G <span class="batt"></span></span></div>
+  <div id="toast">เร็วๆ นี้</div>
 
-  <!-- ชั้นล่างสุด: หน้าหลัก -->
   <div class="screen" id="home">
-    <h1 id="hello"></h1>
-    <p class="sub">ยินดีต้อนรับสู่โซนของฉัน</p>
-    <div class="card" id="homeMsg"></div>
-    <div class="apps" id="apps"></div>
-    <button id="relock">🔒 ล็อกหน้าจอ</button>
+    <div class="widget">
+      <div class="wh">📅 ปฏิทิน</div>
+      <div class="wt" id="cdTitle"></div>
+      <div class="wd" id="cdDate"></div>
+      <div class="wn" id="cdNum"></div>
+    </div>
+    <div class="apps">
+      <button class="appbtn" data-app="chat"><div class="ic c-chat">💬</div>แชต</button>
+      <button class="appbtn" data-app="feed"><div class="ic c-feed">📷</div>โพสต์</button>
+      <button class="appbtn" data-app="gal"><div class="ic c-gal">🌸</div>รูปภาพ</button>
+      <button class="appbtn" data-app="cal"><div class="ic c-cal"><span class="cw" id="calW"></span><span id="calN"></span></div>ปฏิทิน</button>
+
+      <button class="appbtn" data-soon><div class="ic c-cam">📷</div>กล้อง</button>
+      <button class="appbtn" data-soon><div class="ic c-clk">🕐</div>นาฬิกา</button>
+      <button class="appbtn" data-soon><div class="ic c-wea">⛅</div>สภาพอากาศ</button>
+      <button class="appbtn" data-soon><div class="ic c-note">📝</div>โน้ต</button>
+
+      <button class="appbtn" data-soon><div class="ic c-vid">▶️</div>วิดีโอ</button>
+      <button class="appbtn" data-soon><div class="ic c-set">⚙️</div>ตั้งค่า</button>
+      <button class="appbtn" id="relock"><div class="ic c-lock">🔒</div>ล็อก</button>
+    </div>
+    <div class="pdots"><i></i><i></i></div>
+    <div class="dock">
+      <button class="appbtn" data-soon><div class="ic c-tel">📞</div></button>
+      <button class="appbtn" data-soon><div class="ic c-web">🧭</div></button>
+      <button class="appbtn" data-soon><div class="ic c-msg">💬</div></button>
+      <button class="appbtn" data-soon><div class="ic c-mus">🎵</div></button>
+    </div>
   </div>
 
-  <!-- ชั้นกลาง: ใส่รหัส -->
+  <div class="screen app" id="app-chat">
+    <div class="hdr"><button class="back" id="chatBack">‹</button><div class="ttl" id="chatTitle">แชต</div></div>
+    <div class="body" id="chatBody">
+      <div id="chatList"></div>
+      <div id="room">
+        <div id="msgs"></div>
+        <div class="inputbar"><input id="chatInput" placeholder="พิมพ์ข้อความ..."><button id="chatSend">ส่ง</button></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="screen app" id="app-feed">
+    <div class="hdr"><button class="back" data-close>‹</button><div class="ttl">โพสต์</div></div>
+    <div class="body" id="feed"></div>
+  </div>
+
+  <div class="screen app" id="app-cal">
+    <div class="hdr"><button class="back" data-close>‹</button><div class="ttl">ปฏิทิน</div></div>
+    <div class="body">
+      <div class="calnav"><button id="prevM">‹</button><b id="calTitle"></b><button id="nextM">›</button></div>
+      <div class="grid7" id="calGrid"></div>
+      <div class="evtitle" id="evTitle"></div>
+      <div id="evList"></div>
+    </div>
+  </div>
+
+  <div class="screen app" id="app-gal">
+    <div class="hdr"><button class="back" data-close>‹</button><div class="ttl">รูปภาพ</div></div>
+    <div class="body"><div class="gal" id="gal"></div></div>
+    <div id="viewer"><div class="big" id="viewBig"></div><p id="viewCap"></p></div>
+  </div>
+
   <div class="screen" id="pass">
     <div id="passMsg">ใส่รหัสผ่าน</div>
     <div class="dots" id="dots"></div>
@@ -104,110 +230,257 @@
     <button id="cancel">ยกเลิก</button>
   </div>
 
-  <!-- ชั้นบนสุด: หน้าล็อก -->
   <div class="screen" id="lock">
-    <div id="clock">--:--</div>
     <div id="date"></div>
-    <div class="notice"><b>📅 ปฏิทิน</b><span id="noticeText"></span></div>
-    <div class="hint" id="hint">ปัดขึ้นเพื่อปลดล็อก</div>
+    <div id="clock">--:--</div>
+    <div id="notis"></div>
+    <div class="hint" id="hint">ปัดขึ้นเพื่อปลดล็อก<i></i></div>
   </div>
+</div>
 </div>
 
 <script>
-/* ===== ตั้งค่า แก้ตรงนี้ได้เลย ===== */
+const pad = n => String(n).padStart(2, "0");
+const iso = dt => `${dt.getFullYear()}-${pad(dt.getMonth() + 1)}-${pad(dt.getDate())}`;
+const d = off => { const t = new Date(); t.setDate(t.getDate() + off); return iso(t); };
+const esc = s => String(s).replace(/[&<>"']/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
+const parseKey = k => { const [y, m, dd] = k.split("-").map(Number); return new Date(y, m - 1, dd); };
+const thDate = k => parseKey(k).toLocaleDateString("th-TH", { day: "numeric", month: "long" });
+
+/* =====================================================
+   ตั้งค่าทั้งหมดอยู่ตรงนี้ แก้ได้เลย
+   - วอลเปเปอร์: อัปโหลดรูปของคุณไว้ใน repo แล้วใส่ชื่อไฟล์
+     เช่น lockWallpaper: "lock.jpg" (เว้นว่างไว้ = ใช้สีไล่เฉด)
+   - รูปในโพสต์/แกลเลอรี: ใส่ img: "ชื่อรูป.jpg"
+     ถ้าไม่ใส่ img จะใช้ emoji แทน
+   - วันที่เขียนเป็น "2026-11-07" ได้
+   ===================================================== */
 const CONFIG = {
-  name: "ชื่อของคุณ",              // ชื่อที่ทักทายหลังปลดล็อก
-  passcode: "1234",                // รหัสผ่าน 4 หลัก
-  notice: "วันนี้ไม่มีนัดอะไร พักผ่อนได้เลย", // ข้อความแจ้งเตือนบนหน้าล็อก
-  message: "ใส่ข้อความแนะนำตัว หรือเรื่องที่อยากเล่าตรงนี้ได้เลย",
-  apps: [                          // ไอคอนบนหน้าหลัก ใส่ลิงก์จริงได้
-    { icon: "📷", label: "รูปภาพ", url: "#" },
-    { icon: "🎵", label: "เพลง",   url: "#" },
-    { icon: "💬", label: "ติดต่อ", url: "#" },
-    { icon: "⭐", label: "ชอบ",    url: "#" }
+  name: "ชื่อของคุณ",
+  avatar: "🌸",
+  passcode: "1234",
+  notice: "วันนี้ไม่มีนัดอะไร พักผ่อนได้เลย",
+  lockWallpaper: "",
+  homeWallpaper: "",
+
+  countdown: { title: "วันสำคัญ", target: d(10), range: "" },
+
+  chats: [
+    { name: "เพื่อนสนิท", avatar: "🐻", messages: [
+      { from: "them", text: "วันนี้ไปกินข้าวกันป่ะ", time: "18:02" },
+      { from: "me",   text: "ไปดิ หิวมาก", time: "18:03" },
+      { from: "them", text: "งั้นเจอกัน 7 โมงนะ", time: "18:04" } ]},
+    { name: "แม่", avatar: "🌷", messages: [
+      { from: "them", text: "กินข้าวรึยังลูก", time: "12:10" },
+      { from: "me",   text: "กินแล้วจ้า", time: "12:15" } ]},
+    { name: "กลุ่มเพื่อน", avatar: "👯", messages: [
+      { from: "them", text: "เสาร์นี้ใครว่างบ้าง", time: "09:30" },
+      { from: "me",   text: "ว่างงง", time: "09:41" } ]}
+  ],
+
+  posts: [
+    { emoji: "🌇", img: "", caption: "พระอาทิตย์ตกวันนี้สวยมาก", likes: 128, time: "2 ชั่วโมงที่แล้ว" },
+    { emoji: "🍜", img: "", caption: "มื้อเย็นนี้ อร่อยสุดๆ", likes: 86, time: "เมื่อวาน" },
+    { emoji: "🐱", img: "", caption: "น้องแมวไม่ยอมให้ทำงาน", likes: 240, time: "3 วันที่แล้ว" }
+  ],
+
+  events: [
+    { date: d(0),  time: "19:00", title: "กินข้าวกับเพื่อน" },
+    { date: d(2),  time: "10:00", title: "นัดหมอฟัน" },
+    { date: d(10), time: "ทั้งวัน", title: "วันสำคัญ 🎉" }
+  ],
+
+  photos: [
+    { emoji: "🌸", img: "", caption: "ดอกไม้ริมทาง" }, { emoji: "🌊", img: "", caption: "ทะเลวันนั้น" },
+    { emoji: "🍰", img: "", caption: "ของหวาน" },       { emoji: "🎈", img: "", caption: "งานปาร์ตี้" },
+    { emoji: "🌙", img: "", caption: "ดวงจันทร์คืนนี้" }, { emoji: "🐶", img: "", caption: "น้องหมาข้างบ้าน" },
+    { emoji: "☕", img: "", caption: "คาเฟ่ประจำ" },     { emoji: "🌈", img: "", caption: "รุ้งหลังฝนตก" },
+    { emoji: "📚", img: "", caption: "อ่านหนังสือ" }
   ]
 };
 
 const $ = id => document.getElementById(id);
-const lock = $("lock"), pass = $("pass");
+const phone = $("phone"), lock = $("lock"), pass = $("pass");
+const mediaStyle = (img, c) => img ? `background-image:url('${esc(img)}')` : `background:${c}`;
+const tints = ["#ffe3ec", "#e3f0ff", "#fff3d6", "#e6ffe9", "#efe3ff", "#ffe9da"];
 
-/* ---------- 1) นาฬิกาจริง ---------- */
+if (CONFIG.lockWallpaper) phone.style.setProperty("--lockwp", `url('${CONFIG.lockWallpaper}')`);
+if (CONFIG.homeWallpaper) phone.style.setProperty("--homewp", `url('${CONFIG.homeWallpaper}')`);
+
 function tick() {
   const now = new Date();
   const t = now.toLocaleTimeString("th-TH", { hour: "2-digit", minute: "2-digit", hour12: false });
   $("clock").textContent = t;
   $("statusTime").textContent = t;
   $("date").textContent = now.toLocaleDateString("th-TH", { weekday: "long", day: "numeric", month: "long" });
+  $("calW").textContent = now.toLocaleDateString("th-TH", { weekday: "short" });
+  $("calN").textContent = now.getDate();
 }
 tick(); setInterval(tick, 1000);
 
-/* ---------- 2) เติมข้อความจาก CONFIG ---------- */
-$("noticeText").textContent = CONFIG.notice;
-$("hello").textContent = "สวัสดี, " + CONFIG.name;
-$("homeMsg").textContent = CONFIG.message;
-$("apps").innerHTML = CONFIG.apps.map(a =>
-  `<div class="app"><a href="${a.url}"><div class="icon">${a.icon}</div>${a.label}</a></div>`).join("");
+const upcoming = CONFIG.events.filter(e => e.date >= d(0)).sort((a, b) => a.date.localeCompare(b.date)).slice(0, 2);
+$("notis").innerHTML = upcoming.length
+  ? upcoming.map(e => `<div class="noti"><div class="nh"><span>📅 ปฏิทิน</span><span>เร็วๆ นี้</span></div>
+      <div class="nd">${esc(thDate(e.date))}</div><div class="nt">${esc(e.time)} ${esc(e.title)}</div></div>`).join("")
+  : `<div class="noti"><div class="nh"><span>📅 ปฏิทิน</span><span>วันนี้</span></div><div class="nt">${esc(CONFIG.notice)}</div></div>`;
 
-/* ---------- 3) ปัดขึ้นเพื่อปลดล็อก ---------- */
+(function () {
+  const c = CONFIG.countdown, today = parseKey(d(0));
+  const days = Math.round((parseKey(c.target) - today) / 86400000);
+  $("cdTitle").textContent = c.title;
+  $("cdDate").textContent = c.range || thDate(c.target);
+  $("cdNum").textContent = days > 0 ? `อีก ${days} วัน` : days === 0 ? "วันนี้แล้ว!" : "ผ่านไปแล้ว";
+})();
+
 let startY = null;
 lock.addEventListener("pointerdown", e => { startY = e.clientY; });
 lock.addEventListener("pointermove", e => {
   if (startY === null) return;
-  const dy = Math.min(0, e.clientY - startY);          // ลากขึ้นเท่านั้น
   lock.style.transition = "none";
-  lock.style.transform = `translateY(${dy}px)`;
+  lock.style.transform = `translateY(${Math.min(0, e.clientY - startY)}px)`;
 });
 function endSwipe(e) {
   if (startY === null) return;
-  const dy = e.clientY - startY;
-  startY = null;
+  const dy = e.clientY - startY; startY = null;
   lock.style.transition = "";
-  if (dy < -80) openPasscode(); else lock.style.transform = "";  // ลากไกลพอ = ปลดล็อก
+  if (dy < -80) openPasscode(); else lock.style.transform = "";
 }
 lock.addEventListener("pointerup", endSwipe);
 lock.addEventListener("pointercancel", endSwipe);
-$("hint").addEventListener("click", openPasscode);      // กดที่ข้อความก็ได้
-
+$("hint").addEventListener("click", openPasscode);
 function openPasscode() { lock.style.transform = "translateY(-100%)"; lock.style.pointerEvents = "none"; }
 function closePasscode() { lock.style.transform = ""; lock.style.pointerEvents = ""; clearCode(); }
 
-/* ---------- 4) ปุ่มกดรหัส ---------- */
 let code = "";
 const keyLabels = ["1","2","3","4","5","6","7","8","9","","0","⌫"];
-$("keys").innerHTML = keyLabels.map(k =>
-  k === "" ? '<button class="key blank"></button>' : `<button class="key" data-k="${k}">${k}</button>`).join("");
+$("keys").innerHTML = keyLabels.map(k => k === "" ? '<button class="key blank"></button>' : `<button class="key" data-k="${k}">${k}</button>`).join("");
 $("dots").innerHTML = "<div class='dot'></div>".repeat(CONFIG.passcode.length);
-
-function drawDots() {
-  document.querySelectorAll(".dot").forEach((d, i) => d.classList.toggle("on", i < code.length));
-}
+const drawDots = () => document.querySelectorAll(".dot").forEach((x, i) => x.classList.toggle("on", i < code.length));
 function clearCode() { code = ""; drawDots(); $("passMsg").textContent = "ใส่รหัสผ่าน"; }
-
 $("keys").addEventListener("click", e => {
-  const k = e.target.dataset.k;
-  if (!k) return;
+  const k = e.target.dataset.k; if (!k) return;
   if (k === "⌫") code = code.slice(0, -1);
   else if (code.length < CONFIG.passcode.length) code += k;
   drawDots();
-
   if (code.length === CONFIG.passcode.length) {
-    if (code === CONFIG.passcode) {                    // รหัสถูก
-      pass.style.opacity = 0; pass.style.pointerEvents = "none";
-    } else {                                           // รหัสผิด
+    if (code === CONFIG.passcode) { pass.style.opacity = 0; pass.style.pointerEvents = "none"; }
+    else {
       $("passMsg").textContent = "รหัสไม่ถูกต้อง";
       $("dots").classList.add("shake");
       setTimeout(() => { $("dots").classList.remove("shake"); clearCode(); $("passMsg").textContent = "รหัสไม่ถูกต้อง"; }, 400);
     }
   }
 });
-
 $("cancel").addEventListener("click", closePasscode);
 
-/* ---------- 5) ปุ่มล็อกหน้าจอกลับ ---------- */
-$("relock").addEventListener("click", () => {
-  pass.style.opacity = 1; pass.style.pointerEvents = "";
-  closePasscode();
+let current = null;
+function openApp(id) { current = id; $("app-" + id).classList.add("open"); phone.classList.add("light"); }
+function closeApp() { if (current) $("app-" + current).classList.remove("open"); current = null; phone.classList.remove("light"); }
+document.querySelectorAll("[data-app]").forEach(b => b.addEventListener("click", () => openApp(b.dataset.app)));
+document.querySelectorAll("[data-close]").forEach(b => b.addEventListener("click", closeApp));
+$("relock").addEventListener("click", () => { closeApp(); pass.style.opacity = 1; pass.style.pointerEvents = ""; closePasscode(); });
+
+let toastTimer;
+document.querySelectorAll("[data-soon]").forEach(b => b.addEventListener("click", () => {
+  $("toast").classList.add("show"); clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => $("toast").classList.remove("show"), 1200);
+}));
+
+let room = null;
+function renderChatList() {
+  $("chatList").innerHTML = CONFIG.chats.map((c, i) => {
+    const last = c.messages[c.messages.length - 1] || { text: "", time: "" };
+    return `<div class="chatitem" data-i="${i}"><div class="av">${esc(c.avatar)}</div>
+      <div class="t"><div class="n">${esc(c.name)}</div><div class="l">${esc(last.text)}</div></div>
+      <div class="tm">${esc(last.time)}</div></div>`;
+  }).join("");
+}
+function renderRoom() {
+  $("msgs").innerHTML = CONFIG.chats[room].messages.map(m =>
+    `<div class="b ${m.from === "me" ? "me" : "them"}">${esc(m.text)}<small>${esc(m.time)}</small></div>`).join("");
+  $("msgs").scrollTop = $("msgs").scrollHeight;
+}
+function showRoom(i) {
+  room = i;
+  $("chatList").style.display = "none"; $("room").style.display = "flex";
+  $("chatBody").style.overflow = "hidden";
+  $("chatTitle").textContent = CONFIG.chats[i].name;
+  renderRoom();
+}
+function showList() {
+  room = null;
+  $("room").style.display = "none"; $("chatList").style.display = "block";
+  $("chatBody").style.overflow = "";
+  $("chatTitle").textContent = "แชต";
+  renderChatList();
+}
+$("chatList").addEventListener("click", e => { const it = e.target.closest(".chatitem"); if (it) showRoom(+it.dataset.i); });
+$("chatBack").addEventListener("click", () => room !== null ? showList() : closeApp());
+function sendMsg() {
+  const v = $("chatInput").value.trim(); if (!v || room === null) return;
+  const t = new Date().toLocaleTimeString("th-TH", { hour: "2-digit", minute: "2-digit", hour12: false });
+  CONFIG.chats[room].messages.push({ from: "me", text: v, time: t });
+  $("chatInput").value = ""; renderRoom();
+}
+$("chatSend").addEventListener("click", sendMsg);
+$("chatInput").addEventListener("keydown", e => { if (e.key === "Enter") sendMsg(); });
+renderChatList();
+
+$("feed").innerHTML = CONFIG.posts.map((p, i) => `
+  <div class="post">
+    <div class="ph"><div class="av">${esc(CONFIG.avatar)}</div><div><div class="pn">${esc(CONFIG.name)}</div><div class="pt">${esc(p.time)}</div></div></div>
+    <div class="pimg" style="${mediaStyle(p.img, tints[i % tints.length])}">${p.img ? "" : esc(p.emoji)}</div>
+    <div class="pact"><button class="like" data-i="${i}">🤍</button></div>
+    <div class="pcnt"><span id="lk${i}">${p.likes}</span> ถูกใจ</div>
+    <div class="pcap"><b>${esc(CONFIG.name)}</b> ${esc(p.caption)}</div>
+  </div>`).join("");
+$("feed").addEventListener("click", e => {
+  const b = e.target.closest(".like"); if (!b) return;
+  const i = b.dataset.i, liked = b.textContent === "❤️";
+  b.textContent = liked ? "🤍" : "❤️";
+  $("lk" + i).textContent = CONFIG.posts[i].likes + (liked ? 0 : 1);
 });
+
+const todayKey = d(0);
+let cal = new Date(); cal.setDate(1);
+let selected = todayKey;
+function renderEvents() {
+  const list = CONFIG.events.filter(e => e.date === selected);
+  $("evTitle").textContent = parseKey(selected).toLocaleDateString("th-TH", { weekday: "long", day: "numeric", month: "long" });
+  $("evList").innerHTML = list.length
+    ? list.map(e => `<div class="ev"><div class="et">${esc(e.time)}</div><div class="en">${esc(e.title)}</div></div>`).join("")
+    : '<div class="none">ไม่มีนัดหมายวันนี้</div>';
+}
+function renderCal() {
+  const y = cal.getFullYear(), m = cal.getMonth();
+  $("calTitle").textContent = cal.toLocaleDateString("th-TH", { month: "long", year: "numeric" });
+  const first = new Date(y, m, 1).getDay(), days = new Date(y, m + 1, 0).getDate();
+  let h = ["อา", "จ", "อ", "พ", "พฤ", "ศ", "ส"].map(x => `<div class="dow">${x}</div>`).join("");
+  for (let i = 0; i < first; i++) h += "<div></div>";
+  for (let day = 1; day <= days; day++) {
+    const key = `${y}-${pad(m + 1)}-${pad(day)}`;
+    const has = CONFIG.events.some(e => e.date === key);
+    h += `<div class="day ${key === todayKey ? "today" : ""} ${key === selected ? "sel" : ""} ${has ? "has" : ""}" data-d="${key}">${day}</div>`;
+  }
+  $("calGrid").innerHTML = h;
+  renderEvents();
+}
+$("calGrid").addEventListener("click", e => { const x = e.target.closest(".day"); if (x) { selected = x.dataset.d; renderCal(); } });
+$("prevM").addEventListener("click", () => { cal.setMonth(cal.getMonth() - 1); renderCal(); });
+$("nextM").addEventListener("click", () => { cal.setMonth(cal.getMonth() + 1); renderCal(); });
+renderCal();
+
+$("gal").innerHTML = CONFIG.photos.map((p, i) =>
+  `<div class="ph1" data-i="${i}" style="${mediaStyle(p.img, tints[i % tints.length])}">${p.img ? "" : esc(p.emoji)}</div>`).join("");
+$("gal").addEventListener("click", e => {
+  const x = e.target.closest(".ph1"); if (!x) return;
+  const p = CONFIG.photos[+x.dataset.i], big = $("viewBig");
+  big.setAttribute("style", mediaStyle(p.img, tints[+x.dataset.i % tints.length]));
+  big.textContent = p.img ? "" : p.emoji;
+  $("viewCap").textContent = p.caption;
+  $("viewer").style.display = "flex";
+});
+$("viewer").addEventListener("click", () => { $("viewer").style.display = "none"; });
 </script>
 </body>
 </html>
