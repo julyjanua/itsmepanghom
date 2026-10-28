@@ -168,7 +168,7 @@
       <div class="wn" id="cdNum"></div>
     </div>
     <div class="apps">
-      <button class="appbtn" data-app="chat"><div class="ic c-chat">💬</div>แชต</button>
+      <button class="appbtn" data-app="chat"><div class="ic c-chat">💬</div>LINE</button>
       <button class="appbtn" data-app="feed"><div class="ic c-feed">📷</div>โพสต์</button>
       <button class="appbtn" data-app="gal"><div class="ic c-gal">🌸</div>รูปภาพ</button>
       <button class="appbtn" data-app="cal"><div class="ic c-cal"><span class="cw" id="calW"></span><span id="calN"></span></div>ปฏิทิน</button>
@@ -498,6 +498,10 @@ const ICONS = {
     else el.textContent = "";
   });
 })();
+/* ===== ชื่อหัวข้อในแอปแชต ===== */
+$("chatTitle").textContent = "LINE";
+const _showList = showList;
+showList = function () { _showList(); $("chatTitle").textContent = "LINE"; };
 
 </script>
 </body>
