@@ -481,6 +481,24 @@ $("gal").addEventListener("click", e => {
   $("viewer").style.display = "flex";
 });
 $("viewer").addEventListener("click", () => { $("viewer").style.display = "none"; });
+/* ===== ไอคอนแอปแบบใส่รูปเอง ===== */
+const ICONS = {
+  chat: "IMG_1281.jpeg", feed: "", gal: "", cal: "",
+  cam: "", clk: "", wea: "", note: "",
+  vid: "", set: "", lock: "",
+  tel: "", web: "", msg: "", mus: ""
+};
+(function () {
+  const keys = Object.keys(ICONS);
+  document.querySelectorAll(".ic").forEach((el, i) => {
+    const f = ICONS[keys[i]];
+    if (!f) return;
+    el.style.background = `url('${f}') center / cover`;
+    if (keys[i] === "cal") el.querySelectorAll("span").forEach(s => s.style.display = "none");
+    else el.textContent = "";
+  });
+})();
+
 </script>
 </body>
 </html>
