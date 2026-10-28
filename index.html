@@ -83,6 +83,7 @@
   .c-vid  { background: linear-gradient(160deg, #ff5a5a, #d11); }
   .c-set  { background: linear-gradient(160deg, #a5a5ae, #5d5d68); }
   .c-lock { background: linear-gradient(160deg, #666, #2c2c34); }
+  .c-micro{ background: linear-gradient(160deg, #2b2b33, #000); }
   .c-tel  { background: linear-gradient(160deg, #6ee77a, #1fb23a); }
   .c-web  { background: linear-gradient(160deg, #fff, #cfe9ff); }
   .c-msg  { background: linear-gradient(160deg, #78f08a, #24b53f); }
@@ -130,6 +131,21 @@
   .pcnt { padding: 2px 12px; font-weight: 600; font-size: 14px; }
   .pcap { padding: 2px 12px 14px; font-size: 14px; line-height: 1.5; }
 
+  .mic-comp { display: flex; gap: 10px; padding: 12px 14px; background: #fff; border-bottom: 1px solid #eee; }
+  .mic-comp textarea { flex: 1; border: none; outline: none; resize: none; font: inherit; font-size: 16px; min-height: 54px; }
+  .mic-comp button { align-self: flex-end; border: none; background: #111; color: #fff; border-radius: 18px; padding: 8px 16px; cursor: pointer; }
+  .mic-post { display: flex; gap: 10px; padding: 12px 14px; background: #fff; border-bottom: 1px solid #eee; }
+  .mic-post .av { width: 42px; height: 42px; font-size: 22px; }
+  .mic-main { flex: 1; min-width: 0; }
+  .mic-name { font-size: 14px; }
+  .mic-name b { margin-right: 6px; }
+  .mic-name span { color: #888; }
+  .mic-text { font-size: 15px; line-height: 1.45; margin-top: 2px; word-break: break-word; white-space: pre-wrap; }
+  .mic-act { display: flex; justify-content: space-between; max-width: 260px; margin-top: 8px; color: #777; font-size: 13px; }
+  .mic-act button { background: none; border: none; color: inherit; font: inherit; cursor: pointer; }
+  .mic-act button.on { color: #e0245e; }
+  .mic-act button.rt.on { color: #17bf63; }
+
   .calnav { display: flex; align-items: center; justify-content: space-between; padding: 14px 18px; background: #fff; }
   .calnav button { background: none; border: none; font-size: 24px; color: var(--accent); cursor: pointer; padding: 0 10px; }
   .calnav b { font-size: 17px; }
@@ -168,26 +184,27 @@
       <div class="wn" id="cdNum"></div>
     </div>
     <div class="apps">
-      <button class="appbtn" data-app="chat"><div class="ic c-chat">💬</div>LINE</button>
-      <button class="appbtn" data-app="feed"><div class="ic c-feed">📷</div>โพสต์</button>
-      <button class="appbtn" data-app="gal"><div class="ic c-gal">🌸</div>รูปภาพ</button>
-      <button class="appbtn" data-app="cal"><div class="ic c-cal"><span class="cw" id="calW"></span><span id="calN"></span></div>ปฏิทิน</button>
+      <button class="appbtn" data-app="chat"><div class="ic c-chat" data-ic="chat">💬</div><span id="chatLbl">แชต</span></button>
+      <button class="appbtn" data-app="feed"><div class="ic c-feed" data-ic="feed">📷</div>โพสต์</button>
+      <button class="appbtn" data-app="gal"><div class="ic c-gal" data-ic="gal">🌸</div>รูปภาพ</button>
+      <button class="appbtn" data-app="cal"><div class="ic c-cal" data-ic="cal"><span class="cw" id="calW"></span><span id="calN"></span></div>ปฏิทิน</button>
 
-      <button class="appbtn" data-soon><div class="ic c-cam">📷</div>กล้อง</button>
-      <button class="appbtn" data-soon><div class="ic c-clk">🕐</div>นาฬิกา</button>
-      <button class="appbtn" data-soon><div class="ic c-wea">⛅</div>สภาพอากาศ</button>
-      <button class="appbtn" data-soon><div class="ic c-note">📝</div>โน้ต</button>
+      <button class="appbtn" data-soon><div class="ic c-cam" data-ic="cam">📷</div>กล้อง</button>
+      <button class="appbtn" data-soon><div class="ic c-clk" data-ic="clk">🕐</div>นาฬิกา</button>
+      <button class="appbtn" data-soon><div class="ic c-wea" data-ic="wea">⛅</div>สภาพอากาศ</button>
+      <button class="appbtn" data-soon><div class="ic c-note" data-ic="note">📝</div>โน้ต</button>
 
-      <button class="appbtn" data-soon><div class="ic c-vid">▶️</div>วิดีโอ</button>
-      <button class="appbtn" data-soon><div class="ic c-set">⚙️</div>ตั้งค่า</button>
-      <button class="appbtn" id="relock"><div class="ic c-lock">🔒</div>ล็อก</button>
+      <button class="appbtn" data-soon><div class="ic c-vid" data-ic="vid">▶️</div>วิดีโอ</button>
+      <button class="appbtn" data-soon><div class="ic c-set" data-ic="set">⚙️</div>ตั้งค่า</button>
+      <button class="appbtn" id="relock"><div class="ic c-lock" data-ic="lock">🔒</div>ล็อก</button>
+      <button class="appbtn" data-app="micro"><div class="ic c-micro" data-ic="micro">💭</div><span id="microLbl">โพสต์สั้น</span></button>
     </div>
     <div class="pdots"><i></i><i></i></div>
     <div class="dock">
-      <button class="appbtn" data-soon><div class="ic c-tel">📞</div></button>
-      <button class="appbtn" data-soon><div class="ic c-web">🧭</div></button>
-      <button class="appbtn" data-soon><div class="ic c-msg">💬</div></button>
-      <button class="appbtn" data-soon><div class="ic c-mus">🎵</div></button>
+      <button class="appbtn" data-soon><div class="ic c-tel" data-ic="tel">📞</div></button>
+      <button class="appbtn" data-soon><div class="ic c-web" data-ic="web">🧭</div></button>
+      <button class="appbtn" data-soon><div class="ic c-msg" data-ic="msg">💬</div></button>
+      <button class="appbtn" data-soon><div class="ic c-mus" data-ic="mus">🎵</div></button>
     </div>
   </div>
 
@@ -223,6 +240,14 @@
     <div id="viewer"><div class="big" id="viewBig"></div><p id="viewCap"></p></div>
   </div>
 
+  <div class="screen app" id="app-micro">
+    <div class="hdr"><button class="back" data-close>‹</button><div class="ttl" id="microTitle">โพสต์สั้น</div></div>
+    <div class="body">
+      <div class="mic-comp"><textarea id="micText" placeholder="เกิดอะไรขึ้นบ้าง?" maxlength="280"></textarea><button id="micPost">โพสต์</button></div>
+      <div id="micList"></div>
+    </div>
+  </div>
+
   <div class="screen" id="pass">
     <div id="passMsg">ใส่รหัสผ่าน</div>
     <div class="dots" id="dots"></div>
@@ -248,20 +273,28 @@ const parseKey = k => { const [y, m, dd] = k.split("-").map(Number); return new 
 const thDate = k => parseKey(k).toLocaleDateString("th-TH", { day: "numeric", month: "long" });
 
 /* =====================================================
-   ตั้งค่าทั้งหมดอยู่ตรงนี้ แก้ได้เลย
-   - วอลเปเปอร์: อัปโหลดรูปของคุณไว้ใน repo แล้วใส่ชื่อไฟล์
-     เช่น lockWallpaper: "lock.jpg" (เว้นว่างไว้ = ใช้สีไล่เฉด)
-   - รูปในโพสต์/แกลเลอรี: ใส่ img: "ชื่อรูป.jpg"
-     ถ้าไม่ใส่ img จะใช้ emoji แทน
-   - วันที่เขียนเป็น "2026-11-07" ได้
+   ตั้งค่าทั้งหมดอยู่ตรงนี้ แก้ได้เลย (แก้ที่เดียวพอ)
+   - วอลเปเปอร์: ใส่ชื่อไฟล์รูปที่อัปโหลดไว้ใน repo
+     เช่น lockWallpaper: "lock.jpg"  (เว้นว่าง = ใช้สีไล่เฉด)
+   - icons: ใส่ชื่อไฟล์รูปไอคอนของแต่ละแอป (เว้นว่าง = ใช้ไอคอนเดิม)
+   - chatName: ชื่อแอปแชต ตั้งเป็นชื่ออะไรก็ได้
    ===================================================== */
 const CONFIG = {
   name: "ชื่อของคุณ",
   avatar: "🌸",
   passcode: "1234",
   notice: "วันนี้ไม่มีนัดอะไร พักผ่อนได้เลย",
-  lockWallpaper: "IMG_1279.jpeg",
-  homeWallpaper: "IMG_1276.jpeg",
+  lockWallpaper: "",
+  homeWallpaper: "",
+
+  chatName: "แชต",
+
+  icons: {
+    chat: "", feed: "", gal: "", cal: "",
+    cam: "", clk: "", wea: "", note: "",
+    vid: "", set: "", lock: "", micro: "",
+    tel: "", web: "", msg: "", mus: ""
+  },
 
   countdown: { title: "วันสำคัญ", target: d(10), range: "" },
 
@@ -283,6 +316,16 @@ const CONFIG = {
     { emoji: "🍜", img: "", caption: "มื้อเย็นนี้ อร่อยสุดๆ", likes: 86, time: "เมื่อวาน" },
     { emoji: "🐱", img: "", caption: "น้องแมวไม่ยอมให้ทำงาน", likes: 240, time: "3 วันที่แล้ว" }
   ],
+
+  micro: {
+    appName: "โพสต์สั้น",
+    handle: "@yourname",
+    posts: [
+      { text: "สวัสดีทุกคน วันนี้อากาศดีมาก ☀️", time: "2 ชม.", replies: 3, reposts: 5, likes: 42 },
+      { text: "กาแฟแก้วที่ 3 ของวัน ☕", time: "5 ชม.", replies: 1, reposts: 0, likes: 18 },
+      { text: "ใครมีเพลงแนะนำบ้าง ขอหน่อย 🎧", time: "เมื่อวาน", replies: 12, reposts: 2, likes: 67 }
+    ]
+  },
 
   events: [
     { date: d(0),  time: "19:00", title: "กินข้าวกับเพื่อน" },
@@ -306,6 +349,21 @@ const tints = ["#ffe3ec", "#e3f0ff", "#fff3d6", "#e6ffe9", "#efe3ff", "#ffe9da"]
 
 if (CONFIG.lockWallpaper) phone.style.setProperty("--lockwp", `url('${CONFIG.lockWallpaper}')`);
 if (CONFIG.homeWallpaper) phone.style.setProperty("--homewp", `url('${CONFIG.homeWallpaper}')`);
+
+/* ชื่อแอป */
+$("chatLbl").textContent = CONFIG.chatName;
+$("chatTitle").textContent = CONFIG.chatName;
+$("microLbl").textContent = CONFIG.micro.appName;
+$("microTitle").textContent = CONFIG.micro.appName;
+
+/* ไอคอนแบบใส่รูปเอง */
+document.querySelectorAll("[data-ic]").forEach(el => {
+  const f = CONFIG.icons[el.dataset.ic];
+  if (!f) return;
+  el.style.background = `url('${f}') center / cover`;
+  if (el.dataset.ic === "cal") el.querySelectorAll("span").forEach(s => { s.style.display = "none"; });
+  else el.textContent = "";
+});
 
 function tick() {
   const now = new Date();
@@ -411,7 +469,7 @@ function showList() {
   room = null;
   $("room").style.display = "none"; $("chatList").style.display = "block";
   $("chatBody").style.overflow = "";
-  $("chatTitle").textContent = "แชต";
+  $("chatTitle").textContent = CONFIG.chatName;
   renderChatList();
 }
 $("chatList").addEventListener("click", e => { const it = e.target.closest(".chatitem"); if (it) showRoom(+it.dataset.i); });
@@ -481,100 +539,37 @@ $("gal").addEventListener("click", e => {
   $("viewer").style.display = "flex";
 });
 $("viewer").addEventListener("click", () => { $("viewer").style.display = "none"; });
-/* ===== ไอคอนแอปแบบใส่รูปเอง ===== */
-const ICONS = {
-  chat: "IMG_1281.jpeg", feed: "IMG_1286.jpeg", gal: "IMG_1282.jpeg", cal: "",
-  cam: "IMG_1285.jpeg", clk: "IMG_1288.jpeg", wea: "IMG_1284.jpeg", note: "",
-  vid: "IMG_1287.jpeg", set: "", lock: "",
-  tel: "", web: "", msg: "", mus: ""
-};
-(function () {
-  const keys = Object.keys(ICONS);
-  document.querySelectorAll(".ic").forEach((el, i) => {
-    const f = ICONS[keys[i]];
-    if (!f) return;
-    el.style.background = `url('${f}') center / cover`;
-    if (keys[i] === "cal") el.querySelectorAll("span").forEach(s => s.style.display = "none");
-    else el.textContent = "";
-  });
-})();
-/* ===== ชื่อหัวข้อในแอปแชต ===== */
-$("chatTitle").textContent = "LINE";
-const _showList = showList;
-showList = function () { _showList(); $("chatTitle").textContent = "LINE"; };
-/* ===== แอปโพสต์สั้น (เพิ่มใหม่) ===== */
-const MICRO = {
-  appName: "โพสต์สั้น",     // เปลี่ยนชื่อแอปได้ตรงนี้
-  handle: "@yourname",
-  posts: [
-    { text: "สวัสดีทุกคน วันนี้อากาศดีมาก ☀️", time: "2 ชม.", replies: 3, reposts: 5, likes: 42 },
-    { text: "กาแฟแก้วที่ 3 ของวัน ☕", time: "5 ชม.", replies: 1, reposts: 0, likes: 18 },
-    { text: "ใครมีเพลงแนะนำบ้าง ขอหน่อย 🎧", time: "เมื่อวาน", replies: 12, reposts: 2, likes: 67 }
-  ]
-};
-(function () {
-  const st = document.createElement("style");
-  st.textContent = `
-    .mic-comp{display:flex;gap:10px;padding:12px 14px;background:#fff;border-bottom:1px solid #eee}
-    .mic-comp textarea{flex:1;border:none;outline:none;resize:none;font:inherit;font-size:16px;min-height:54px}
-    .mic-comp button{align-self:flex-end;border:none;background:#111;color:#fff;border-radius:18px;padding:8px 16px;cursor:pointer}
-    .mic-post{display:flex;gap:10px;padding:12px 14px;background:#fff;border-bottom:1px solid #eee}
-    .mic-post .av{width:42px;height:42px;font-size:22px}
-    .mic-main{flex:1;min-width:0}
-    .mic-name{font-size:14px}.mic-name b{margin-right:6px}.mic-name span{color:#888}
-    .mic-text{font-size:15px;line-height:1.45;margin-top:2px;word-break:break-word;white-space:pre-wrap}
-    .mic-act{display:flex;justify-content:space-between;max-width:260px;margin-top:8px;color:#777;font-size:13px}
-    .mic-act button{background:none;border:none;color:inherit;font:inherit;cursor:pointer}
-    .mic-act button.on{color:#e0245e}
-    .mic-act button.rt.on{color:#17bf63}
-  `;
-  document.head.appendChild(st);
 
-  const app = document.createElement("div");
-  app.className = "screen app";
-  app.id = "app-micro";
-  app.innerHTML = `<div class="hdr"><button class="back" id="micBack">‹</button><div class="ttl">${esc(MICRO.appName)}</div></div>
-    <div class="body">
-      <div class="mic-comp"><textarea id="micText" placeholder="เกิดอะไรขึ้นบ้าง?" maxlength="280"></textarea><button id="micPost">โพสต์</button></div>
-      <div id="micList"></div>
-    </div>`;
-  phone.insertBefore(app, $("pass"));
-
-  let mine = [];
-  try { mine = JSON.parse(localStorage.getItem("micPosts") || "[]"); } catch (e) {}
-  const list = () => mine.concat(MICRO.posts);
-  const save = () => { try { localStorage.setItem("micPosts", JSON.stringify(mine)); } catch (e) {} };
-
-  function render() {
-    $("micList").innerHTML = list().map((p, i) => `
-      <div class="mic-post"><div class="av">${esc(CONFIG.avatar)}</div><div class="mic-main">
-        <div class="mic-name"><b>${esc(CONFIG.name)}</b><span>${esc(MICRO.handle)} · ${esc(p.time)}</span></div>
-        <div class="mic-text">${esc(p.text)}</div>
-        <div class="mic-act">
-          <button>💬 ${p.replies}</button>
-          <button class="rt ${p.rt ? "on" : ""}" data-a="rt" data-i="${i}">🔁 ${p.reposts + (p.rt ? 1 : 0)}</button>
-          <button class="${p.lk ? "on" : ""}" data-a="lk" data-i="${i}">${p.lk ? "❤️" : "🤍"} ${p.likes + (p.lk ? 1 : 0)}</button>
-        </div></div></div>`).join("");
-  }
-
-  $("micList").addEventListener("click", e => {
-    const b = e.target.closest("button[data-a]"); if (!b) return;
-    const p = list()[+b.dataset.i];
-    p[b.dataset.a] = !p[b.dataset.a];
-    save(); render();
-  });
-
-  $("micPost").addEventListener("click", () => {
-    const v = $("micText").value.trim(); if (!v) return;
-    mine.unshift({ text: v, time: "ตอนนี้", replies: 0, reposts: 0, likes: 0 });
-    $("micText").value = "";
-    save(); render();
-  });
-
-  const btn = document.createElement("button");
-  btn.className = "appbtn";
-  btn.innerHTML = `<div class="ic" style="background:linear-gradient(160deg,#2b2b33,#000)">💭
-
+/* ---------- แอปโพสต์สั้น ---------- */
+let mine = [];
+try { mine = JSON.parse(localStorage.getItem("micPosts") || "[]"); } catch (e) { mine = []; }
+const micAll = () => mine.concat(CONFIG.micro.posts);
+const micSave = () => { try { localStorage.setItem("micPosts", JSON.stringify(mine)); } catch (e) {} };
+function renderMic() {
+  $("micList").innerHTML = micAll().map((p, i) => `
+    <div class="mic-post"><div class="av">${esc(CONFIG.avatar)}</div><div class="mic-main">
+      <div class="mic-name"><b>${esc(CONFIG.name)}</b><span>${esc(CONFIG.micro.handle)} · ${esc(p.time)}</span></div>
+      <div class="mic-text">${esc(p.text)}</div>
+      <div class="mic-act">
+        <button>💬 ${p.replies}</button>
+        <button class="rt ${p.rt ? "on" : ""}" data-a="rt" data-i="${i}">🔁 ${p.reposts + (p.rt ? 1 : 0)}</button>
+        <button class="${p.lk ? "on" : ""}" data-a="lk" data-i="${i}">${p.lk ? "❤️" : "🤍"} ${p.likes + (p.lk ? 1 : 0)}</button>
+      </div></div></div>`).join("");
+}
+$("micList").addEventListener("click", e => {
+  const b = e.target.closest("button[data-a]"); if (!b) return;
+  const p = micAll()[+b.dataset.i];
+  p[b.dataset.a] = !p[b.dataset.a];
+  micSave(); renderMic();
+});
+$("micPost").addEventListener("click", () => {
+  const v = $("micText").value.trim(); if (!v) return;
+  mine.unshift({ text: v, time: "ตอนนี้", replies: 0, reposts: 0, likes: 0 });
+  $("micText").value = "";
+  micSave(); renderMic();
+});
+renderMic();
+$("home").querySelector('[data-app="feed"]').after($("home").querySelector('[data-app="micro"]')); 
 </script>
 </body>
 </html>
